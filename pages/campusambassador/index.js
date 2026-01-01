@@ -10,19 +10,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function CampusAmbassador() {
-    const {taskLoading,leaderboardLoading,userLoading}= useSelector(state => state.campusAmbassador)
-    const session=useSession()
-    const dispatch=useDispatch()
-    const {leaderboard}=useSelector(state=>state.campusAmbassador)
-    const leaderboardRef=useRef(null)
+    const { taskLoading, leaderboardLoading, userLoading } = useSelector((state) => state.campusAmbassador);
+    const session = useSession();
+    const dispatch = useDispatch();
+    const { leaderboard } = useSelector((state) => state.campusAmbassador);
+    const leaderboardRef = useRef(null);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(
-                  `${BACKEND_URL}/ambassador/user?email=` +
-                    session?.data?.user?.email
-                );
+                const response = await fetch(`${BACKEND_URL}/ambassador/user?email=` + session?.data?.user?.email);
                 const data = await response.json();
                 // console.log(data);
                 // console.log(data.id)
@@ -39,7 +36,7 @@ export default function CampusAmbassador() {
         const fetchTasks = async (userId) => {
             try {
                 // console.log(userId)
-                const response = await fetch(`${BACKEND_URL}/ambassador/tasks?userId=`+userId);
+                const response = await fetch(`${BACKEND_URL}/ambassador/tasks?userId=` + userId);
                 const data = await response.json();
                 dispatch(addTask(data));
                 dispatch(updateTaskLoading(false));
@@ -88,38 +85,56 @@ export default function CampusAmbassador() {
                 <Nav />
                 <div className="flex px-4 mb-4 flex-col gap-6">
                     <h1 className="text-3xl font-bold text-center my-4">Campus Ambassador Dashboard E-Cell IIT BHU</h1>
-                    {(taskLoading||userLoading||leaderboardLoading) ?
-                        <Loader rotate="rotate" className="block mt-12 animate-spin mx-auto w-16 h-16" />
-                        : (
-                        
-                        <div className="grid grid-cols-12 gap-6">
+                    <div className="grid grid-cols-12 gap-6">
                         <div className="col-span-12 w-fit mx-auto py-2 px-4 rounded-sm border border-green md:flex justify-center items-center gap-4">
-                            {leaderboard && (
-                                <p className="md:text-xl max-md:text-lg pt-3">
-                               <span className="text-orange-400">{leaderboard[0]?.name}</span> from{" "}
-                              {leaderboard[0]?.collegeName} is leading the points table with{" "}
-                                <span className="text-green-600">{leaderboard[0]?.points}</span> points!
-                                </p>
-                             )}
-                        <div className="flex justify-end">
-                             <button onClick={scrollToLeaderboard} className="btn btn-outline-primary px-4 py-2">
-                             View
-                             </button>
-                         </div>
-                         </div>
+                            {leaderboardLoading ? (
+                                <Loader className="block mt-2 animate-spin mx-auto w-10 h-10" />
+                            ) : (
+                                leaderboard && (
+                                    <p className="md:text-xl max-md:text-lg pt-3">
+                                        <span className="text-orange-400">{leaderboard[0]?.name}</span> from {leaderboard[0]?.collegeName} is leading the points table with{" "}
+                                        <span className="text-green-600">{leaderboard[0]?.points}</span> points!
+                                    </p>
+                                )
+                            )}
+                            <div className="flex justify-end">
+                                <button onClick={scrollToLeaderboard} className="btn btn-outline-primary px-4 py-2">
+                                    View
+                                </button>
+                            </div>
+                        </div>
 
-                          <div className="col-span-12 flex flex-col md:flex-row gap-6 items-stretch">
-                          <div className="md:w-1/3 w-full">
-                              <Profile className="h-full" />
-                          </div>
-                          <div className="md:w-2/3 w-full">
-                              <TaskList className="h-full overflow-y-auto" />
-                          </div>
-                          </div>
+                        <div className="col-span-12 flex flex-col md:flex-row gap-6 items-stretch">
+                            <div className="md:w-1/3 w-full">
+                                {userLoading ? (
+                                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm h-full flex items-center justify-center">
+                                        <Loader className="animate-spin w-12 h-12 text-gray-400" />
+                                    </div>
+                                ) : (
+                                    <Profile className="h-full" />
+                                )}
+                            </div>
+                            <div className="md:w-2/3 w-full">
+                                {taskLoading ? (
+                                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 h-[400px] flex items-center justify-center">
+                                        <Loader className="animate-spin w-12 h-12 text-gray-400" />
+                                    </div>
+                                ) : (
+                                    <TaskList className="h-full overflow-y-auto" />
+                                )}
+                            </div>
+                        </div>
 
-                            <Leaderboard ref={leaderboardRef} className="col-span-12" />
-                           </div>    
-                          )}
+                        <div className="col-span-12">
+                            {leaderboardLoading ? (
+                                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-8 h-40 flex items-center justify-center">
+                                    <Loader className="animate-spin w-12 h-12 text-gray-400" />
+                                </div>
+                            ) : (
+                                <Leaderboard ref={leaderboardRef} className="col-span-12" />
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
