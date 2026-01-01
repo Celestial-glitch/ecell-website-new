@@ -25,7 +25,7 @@ export default function CampusAmbassador() {
                 // console.log(data.id)
                 dispatch(updateUser(data));
                 dispatch(updateUserLoading(false));
-                return data.id;
+                return session?.data?.user?.email;
             } catch (error) {
                 console.error("Error fetching user data:", error);
                 dispatch(updateUserLoading(false));
@@ -36,7 +36,7 @@ export default function CampusAmbassador() {
         const fetchTasks = async (userId) => {
             try {
                 // console.log(userId)
-                const response = await fetch(`${BACKEND_URL}/ambassador/tasks?userId=` + userId);
+                const response = await fetch(`${BACKEND_URL}/ambassador/tasks?email=` + userId);
                 const data = await response.json();
                 dispatch(addTask(data));
                 dispatch(updateTaskLoading(false));
