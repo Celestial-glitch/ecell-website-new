@@ -80,8 +80,6 @@ const TaskList = ({ className }) => {
                 return "bg-gradient-to-r from-gray-50 to-slate-50 border-l-4 border-gray-400";
         }
     };
-    //console.log("All tasks from Redux:", tasks);
-    console.log("task objext:", tasks[0]);
 
     return (
         <div className={cn("md:p-8 max-md:p-5 bg-white rounded-2xl shadow-xl border border-gray-100", className)}>
