@@ -1,4 +1,5 @@
 import { Box, Button, Modal, TextField, CircularProgress } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 export default function ControlTasks() {
@@ -66,75 +67,94 @@ export default function ControlTasks() {
     useEffect(() => {
         fetchTasks();
     }, []);
-    return (
-        <Box sx={{ p: 2 }}>
-            <h3>All Tasks</h3>
-            {loading ? ( // Show loader while tasks are being fetched
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
-                    <CircularProgress />
+   return (
+    <Box sx={{ p: 2 }}>
+        <h3>All Tasks</h3>
+        {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
+                <CircularProgress />
+            </Box>
+        ) : (
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Title</strong></TableCell>
+                            <TableCell><strong>Description</strong></TableCell>
+                            <TableCell><strong>Last Date</strong></TableCell>
+                            <TableCell><strong>Points</strong></TableCell>
+                            <TableCell><strong>Actions</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {[...tasks]
+                            .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
+                            .map((task) => (
+                                <TableRow key={task.id}>
+                                    <TableCell>{task.title}</TableCell>
+                                    <TableCell>{task.description}</TableCell>
+                                    <TableCell>{new Date(task.lastDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>{task.points}</TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={() => handleEditTask(task)}
+                                            sx={{ mr: 1 }}
+                                            size="small"
+                                        >
+                                            EDIT
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            size="small"
+                                        >
+                                            DELETE
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )}
+        {editingTask && (
+            <Modal open={true} onClose={() => setEditingTask(null)}>
+                <Box sx={{ p: 4, background: "white", borderRadius: 2, position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', minWidth: 400 }}>
+                    <h3>Edit Task</h3>
+                    <TextField
+                        label="Title"
+                        value={editingTask.title}
+                        onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                        fullWidth
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        label="Description"
+                        value={editingTask.description}
+                        onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                        fullWidth
+                        multiline
+                        rows={4}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        label="Last Date"
+                        value={editingTask.lastDate}
+                        onChange={(e) => setEditingTask({ ...editingTask, lastDate: e.target.value })}
+                        type="date"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <Button variant="contained" onClick={handleSaveEdit}>
+                        Save
+                    </Button>
                 </Box>
-            ) : (
-                <Box>
-                    {tasks.map((task) => (
-                        <Box key={task.id} sx={{ mb: 2, p: 2, border: "1px solid #ccc", borderRadius: 2 }}>
-                            <h4>{task.title}</h4>
-                            <p>{task.description}</p>
-                            <p><strong>Last Date:</strong> {new Date(task.lastDate).toLocaleDateString()}</p>
-                            <p><strong>Points:</strong> {task.points}</p>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={() => handleEditTask(task)}
-                                sx={{ mr: 2 }}
-                            >
-                                Edit
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={() => handleDeleteTask(task.id)}
-                            >
-                                Delete
-                            </Button>
-                        </Box>
-                    ))}
-                </Box>
-            )}
-            {editingTask && (
-                <Modal sx={{ p: 4, background: "red", borderRadius: 2 }}  open={true} onClose={() => setEditingTask(null)}>
-                    <Box sx={{ p: 4, background: "white", borderRadius: 2 }}>
-                        <h3>Edit Task</h3>
-                        <TextField
-                            label="Title"
-                            value={editingTask.title}
-                            onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
-                            fullWidth
-                            sx={{ mb: 2 }}
-                        />
-                        <TextField
-                            label="Description"
-                            value={editingTask.description}
-                            onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
-                            fullWidth
-                            multiline
-                            rows={4}
-                            sx={{ mb: 2 }}
-                        />
-                        <TextField
-                            label="Last Date"
-                            value={editingTask.lastDate}
-                            onChange={(e) => setEditingTask({ ...editingTask, lastDate: e.target.value })}
-                            type="date"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            InputLabelProps={{ shrink: true }}
-                        />
-                        <Button variant="contained" onClick={handleSaveEdit}>
-                            Save
-                        </Button>
-                    </Box>
-                </Modal>
-            )}
-        </Box>
-    );
+            </Modal>
+        )}
+    </Box>
+);
 }
